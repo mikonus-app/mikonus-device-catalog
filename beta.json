@@ -1,5 +1,20 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "beta-1",
-  "entries": []
+  "catalogVersion": "beta-2",
+  "entries": [
+    {
+      "id": "homey.tasmota-mqtt.switch-2.power",
+      "match": {
+        "provider": "homey",
+        "driverID": "homey:app:com.paveld.tasmota:tasmota_mqtt",
+        "nativeIdentifier": "switch.2"
+      },
+      "resolution": {
+        "kind": "power",
+        "displayName": "Switch 2",
+        "readable": true,
+        "writable": true
+      }
+    }
+  ]
 }
