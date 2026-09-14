@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "beta-2",
+  "catalogVersion": "beta-3",
   "entries": [
     {
       "id": "homey.tasmota-mqtt.switch-2.power",
@@ -12,6 +12,48 @@
       "resolution": {
         "kind": "power",
         "displayName": "Switch 2",
+        "readable": true,
+        "writable": true
+      }
+    },
+    {
+      "id": "homey.tasmota-mqtt.switch-1.power",
+      "match": {
+        "provider": "homey",
+        "driverID": "homey:app:com.paveld.tasmota:tasmota_mqtt",
+        "nativeIdentifier": "switch.1"
+      },
+      "resolution": {
+        "kind": "power",
+        "displayName": "Switch 1",
+        "readable": true,
+        "writable": true
+      }
+    },
+    {
+      "id": "homey.tasmota-mqtt.switch-3.power",
+      "match": {
+        "provider": "homey",
+        "driverID": "homey:app:com.paveld.tasmota:tasmota_mqtt",
+        "nativeIdentifier": "switch.3"
+      },
+      "resolution": {
+        "kind": "power",
+        "displayName": "Switch 3",
+        "readable": true,
+        "writable": true
+      }
+    },
+    {
+      "id": "homey.tasmota-mqtt.switch-4.power",
+      "match": {
+        "provider": "homey",
+        "driverID": "homey:app:com.paveld.tasmota:tasmota_mqtt",
+        "nativeIdentifier": "switch.4"
+      },
+      "resolution": {
+        "kind": "power",
+        "displayName": "Switch 4",
         "readable": true,
         "writable": true
       }
