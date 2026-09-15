@@ -98,6 +98,33 @@ def reject_non_finite_number(value: str) -> NoReturn:
     fail("$", f"non-finite JSON number {value!r} is not allowed")
 
 
+def validate_unicode(value: Any, path: str = "$") -> None:
+    """Reject unpaired UTF-16 surrogate code points in all JSON strings."""
+    if isinstance(value, str):
+        index = 0
+        while index < len(value):
+            code_point = ord(value[index])
+            if 0xD800 <= code_point <= 0xDBFF:
+                if index + 1 >= len(value) or not (
+                    0xDC00 <= ord(value[index + 1]) <= 0xDFFF
+                ):
+                    fail(path, "contains an unpaired high Unicode surrogate")
+                index += 2
+                continue
+            if 0xDC00 <= code_point <= 0xDFFF:
+                fail(path, "contains an unpaired low Unicode surrogate")
+            index += 1
+        return
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            validate_unicode(key, f"{path} object key")
+            validate_unicode(nested, f"{path}.{key}")
+        return
+    if isinstance(value, list):
+        for index, nested in enumerate(value):
+            validate_unicode(nested, f"{path}[{index}]")
+
+
 def require_object(value: Any, path: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         fail(path, "must be an object")
@@ -228,6 +255,7 @@ def validate_resolution(raw: Any, match: dict[str, Any], path: str) -> None:
 
 
 def validate_document(document: Any) -> None:
+    validate_unicode(document)
     root = require_object(document, "$")
     require_only_fields(root, ROOT_FIELDS, "$")
     require_fields(root, ROOT_FIELDS, "$")

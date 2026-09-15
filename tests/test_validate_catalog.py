@@ -156,6 +156,39 @@ class CatalogValidatorTests(unittest.TestCase):
                     with self.assertRaises(CatalogValidationError):
                         validate_file(path)
 
+    def test_rejects_lone_high_surrogate(self):
+        self.assert_json_invalid(
+            r'{"schemaVersion":2,"catalogVersion":"\ud800","entries":[]}'
+        )
+
+    def test_rejects_lone_low_surrogate(self):
+        self.assert_json_invalid(
+            r'{"schemaVersion":2,"catalogVersion":"\udc00","entries":[]}'
+        )
+
+    def test_rejects_surrogate_in_nested_string(self):
+        document = copy.deepcopy(self.document)
+        document["entries"][0]["resolution"]["displayName"] = "\ud800"
+        with self.assertRaises(CatalogValidationError):
+            validate_document(document)
+
+    def test_rejects_surrogate_in_object_key(self):
+        document = copy.deepcopy(self.document)
+        document["entries"][0]["resolution"]["commandMapping"] = {"\udc00": "on"}
+        with self.assertRaises(CatalogValidationError):
+            validate_document(document)
+
+    def test_accepts_normal_unicode(self):
+        document = copy.deepcopy(self.document)
+        document["catalogVersion"] = "Grüße-日本語"
+        document["entries"][0]["resolution"]["displayName"] = "Licht 💡"
+        validate_document(document)
+
+    def test_accepts_valid_supplementary_unicode_and_surrogate_pair(self):
+        self.assert_json_valid(
+            r'{"schemaVersion":2,"catalogVersion":"rocket-\ud83d\ude80","entries":[]}'
+        )
+
     @staticmethod
     def _ha_raw_document():
         return {
@@ -173,6 +206,19 @@ class CatalogValidatorTests(unittest.TestCase):
                 },
             }],
         }
+
+    def assert_json_invalid(self, content):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "catalog.json"
+            path.write_text(content, encoding="utf-8")
+            with self.assertRaises(CatalogValidationError):
+                validate_file(path)
+
+    def assert_json_valid(self, content):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "catalog.json"
+            path.write_text(content, encoding="utf-8")
+            validate_file(path)
 
 
 if __name__ == "__main__":
